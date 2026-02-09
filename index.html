@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De of Het? - Dutch Article Practice</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>De of Het?</h1>
+            <div id="score-display">
+                <span id="correct-count">0</span> ✓ &nbsp;
+                <span id="wrong-count">0</span> ✗ &nbsp;
+                <span id="streak-count">Streak: 0</span>
+            </div>
+        </header>
+
+        <main>
+            <div id="word-card">
+                <div id="dutch-word"></div>
+            </div>
+
+            <div id="article-question" class="question-block">
+                <p class="question-label">What is the article?</p>
+                <div class="options article-options">
+                    <button class="option-btn article-btn" data-article="de">de</button>
+                    <button class="option-btn article-btn" data-article="het">het</button>
+                </div>
+                <div id="article-feedback" class="feedback hidden"></div>
+            </div>
+
+            <div id="meaning-question" class="question-block">
+                <p class="question-label">What does it mean in English?</p>
+                <div id="meaning-options" class="options meaning-options"></div>
+                <div id="meaning-feedback" class="feedback hidden"></div>
+            </div>
+
+            <button id="next-btn" class="hidden">Next Word →</button>
+        </main>
+    </div>
+
+    <script src="words.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
