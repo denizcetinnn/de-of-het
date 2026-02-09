@@ -30,6 +30,51 @@ const nextBtn = document.getElementById("next-btn");
 const correctCountEl = document.getElementById("correct-count");
 const wrongCountEl = document.getElementById("wrong-count");
 const streakCountEl = document.getElementById("streak-count");
+const ttsBtn = document.getElementById("tts-btn");
+
+// TTS — Google Translate audio for natural Dutch pronunciation
+const ttsAudio = new Audio();
+
+function showToast(msg) {
+    // Remove existing toast if any
+    const old = document.getElementById("toast");
+    if (old) old.remove();
+
+    const toast = document.createElement("div");
+    toast.id = "toast";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+
+    // Trigger reflow then animate in
+    requestAnimationFrame(() => toast.classList.add("visible"));
+
+    setTimeout(() => {
+        toast.classList.remove("visible");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function speakDutch(text) {
+    const encoded = encodeURIComponent(text);
+    ttsAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=nl&q=${encoded}`;
+
+    ttsBtn.classList.add("speaking");
+    ttsAudio.play().catch(() => {
+        ttsBtn.classList.remove("speaking");
+        showToast("Could not play audio - check your internet connection.");
+    });
+}
+
+ttsAudio.addEventListener("ended", () => ttsBtn.classList.remove("speaking"));
+ttsAudio.addEventListener("error", () => {
+    ttsBtn.classList.remove("speaking");
+    showToast("Could not play audio — check your internet connection.");
+});
+
+ttsBtn.addEventListener("click", () => {
+    const word = WORDS[currentIndex];
+    if (word) speakDutch(word.dutch);
+});
 
 // Build initial queue (shuffled)
 function initQueue() {
@@ -112,6 +157,9 @@ function showWord() {
 
     // Hide next button
     nextBtn.classList.add("hidden");
+
+    // Scroll to top on mobile
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Handle article answer

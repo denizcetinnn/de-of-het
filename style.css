@@ -12,6 +12,8 @@ body {
     display: flex;
     justify-content: center;
     padding: 20px;
+    padding-bottom: 60px;
+    overflow-y: auto;
 }
 
 #app {
@@ -56,10 +58,50 @@ header h1 {
     border: 2px solid #0f3460;
 }
 
+#word-card-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
 #dutch-word {
     font-size: 2.5rem;
     font-weight: 700;
     color: #fff;
+}
+
+#tts-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    border: 2px solid #0f3460;
+    background: #0f3460;
+    color: #aaa;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+#tts-btn:hover {
+    border-color: #e94560;
+    color: #fff;
+    background: #1a1a3e;
+}
+
+#tts-btn:active {
+    transform: scale(0.9);
+}
+
+#tts-btn.speaking {
+    border-color: #4ecca3;
+    color: #4ecca3;
+    background: #1a3a2e;
 }
 
 .question-block {
@@ -204,4 +246,29 @@ header h1 {
 
 #next-btn.hidden {
     display: none;
+}
+
+/* Toast notification */
+#toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #e94560;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    text-align: center;
+    max-width: 90%;
+}
+
+#toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
