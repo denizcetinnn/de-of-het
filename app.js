@@ -33,10 +33,9 @@ const streakCountEl = document.getElementById("streak-count");
 const ttsBtn = document.getElementById("tts-btn");
 
 // TTS — Google Translate audio for natural Dutch pronunciation
-const ttsAudio = new Audio();
+// Tries Audio element first (works locally), falls back to iframe (works on HTTPS/GitHub Pages)
 
 function showToast(msg) {
-    // Remove existing toast if any
     const old = document.getElementById("toast");
     if (old) old.remove();
 
@@ -45,7 +44,6 @@ function showToast(msg) {
     toast.textContent = msg;
     document.body.appendChild(toast);
 
-    // Trigger reflow then animate in
     requestAnimationFrame(() => toast.classList.add("visible"));
 
     setTimeout(() => {
@@ -54,21 +52,55 @@ function showToast(msg) {
     }, 3000);
 }
 
-function speakDutch(text) {
-    const encoded = encodeURIComponent(text);
-    ttsAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=nl&q=${encoded}`;
+let ttsIframe = null;
+let ttsTimeout = null;
+const ttsAudio = new Audio();
 
-    ttsBtn.classList.add("speaking");
-    ttsAudio.play().catch(() => {
+function getTtsUrl(text) {
+    return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=nl&q=${encodeURIComponent(text)}`;
+}
+
+function speakViaIframe(url) {
+    if (ttsIframe) ttsIframe.remove();
+    if (ttsTimeout) clearTimeout(ttsTimeout);
+
+    ttsIframe = document.createElement("iframe");
+    ttsIframe.style.display = "none";
+    ttsIframe.allow = "autoplay";
+    ttsIframe.src = url;
+    document.body.appendChild(ttsIframe);
+
+    ttsTimeout = setTimeout(() => {
         ttsBtn.classList.remove("speaking");
-        showToast("Could not play audio - check your internet connection.");
-    });
+    }, 2000);
+}
+
+function speakDutch(text) {
+    if (!navigator.onLine) {
+        showToast("Could not play audio — check your internet connection.");
+        return;
+    }
+
+    const url = getTtsUrl(text);
+    ttsBtn.classList.add("speaking");
+
+    // Try direct Audio first (works locally and some browsers)
+    ttsAudio.src = url;
+    ttsAudio.play()
+        .then(() => {
+            // Audio is playing — great, nothing else needed
+        })
+        .catch(() => {
+            // Audio blocked (CORS on HTTPS) — fall back to iframe
+            speakViaIframe(url);
+        });
 }
 
 ttsAudio.addEventListener("ended", () => ttsBtn.classList.remove("speaking"));
 ttsAudio.addEventListener("error", () => {
-    ttsBtn.classList.remove("speaking");
-    showToast("Could not play audio — check your internet connection.");
+    // Audio failed to load — try iframe fallback
+    const url = ttsAudio.src;
+    if (url) speakViaIframe(url);
 });
 
 ttsBtn.addEventListener("click", () => {
